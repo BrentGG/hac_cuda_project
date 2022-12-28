@@ -26,6 +26,7 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
   int maxPixelB=0;
   int minPixelB=0;
 
+
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
@@ -33,13 +34,11 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
             Pixel* ptrPixel = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
             unsigned char pixelValue = (unsigned char)(ptrPixel->r * 0.2126f + ptrPixel->g * 0.7152f + ptrPixel->b * 0.0722f);
 
-
-            //wip ideals deel 2 min/max/avg pooling
-
+//---------------------min/max/avg pooling----------------------------------------------------------------
             //avg pooling RED
             avgPixelR=avgPixelR+ptrPixel->r;
-              avgPixelG=avgPixelG+ptrPixel->g;
-                avgPixelB=avgPixelB+ptrPixel->b;
+            avgPixelG=avgPixelG+ptrPixel->g;
+            avgPixelB=avgPixelB+ptrPixel->b;
             //max pooling RED
             if (ptrPixel->r > maxPixelR)
             {
@@ -70,6 +69,19 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
             {
               minPixelB=ptrPixel->b;
             }
+
+
+//---------------------2D convolutie----------------------------------------------------------------------
+/*
+
+
+
+
+
+*/
+
+
+
         }
     }
     avgPixelR= avgPixelR/(height*width);
