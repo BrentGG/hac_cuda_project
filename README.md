@@ -9,6 +9,8 @@
 
 ![titel opdracht](files&Documents/cudaTaakTitel.png?raw=true)
 
+## Deel 1:
 ![opdracht 1](files&Documents/cudaTaakDeel1.png?raw=true)
 
+## Deel 2:
 ![opdracht 2](files&Documents/cudaTaakDeel2.png?raw=true)
