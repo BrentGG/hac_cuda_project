@@ -6,3 +6,9 @@
 - [ ] min/max pooling berekenen (zie deel 2) in cuda
 - [ ] deel 1 in C schrijven en bekijk verschil met cuda
 - [ ] deel 2 in C schrijven en bekijk verschil met cuda
+
+![titel opdracht](files&Documents/cudaTaakTitel.png?raw=true)
+
+![opdracht 1](files&Documents/cudaTaakDeel1.png?raw=true)
+
+![opdracht 2](files&Documents/cudaTaakDeel2.png?raw=true)
