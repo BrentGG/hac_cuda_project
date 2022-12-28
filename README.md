@@ -17,15 +17,19 @@
 
 ## getting started (WIP)
 
-1.- open nieuw notebook in google colab [link](https://colab.research.google.com/drive/11K5aESAQQHsml9ied-BsuLnP-zG6wLMZ).
-2.- geef onderstaande code in (naamgeving vrij te kiezen)
-  "%%writefile opdrachtHAC.cu" 
-  <insert code> 
-3.- plak afbeelding en stb_image.h en stb_image_write.h bij bestanden
-4.- geef onderstaande code in (zelfde naamgeving als 2de stap, "test" vrij te kiezen)
-  "!nvcc opdrachtHAC.cu -o test"
-5.- geef onderstaande code in (zelfde naamgeving als stap 4, afbeelding met correcte naamgeving)
-  !./test mario.png
+1.- open nieuw notebook in google colab [link](https://colab.research.google.com/drive/11K5aESAQQHsml9ied-BsuLnP-zG6wLMZ).<br/>
+
+2.- geef onderstaande code in (naamgeving vrij te kiezen)<br/>
+  "%%writefile opdrachtHAC.cu" <br/>
+  "<insert code (opdrachtHAC.cu)>"  <br/>
+  
+3.- plak afbeelding en stb_image.h en stb_image_write.h bij bestanden <br/>
+
+4.- geef onderstaande code in (zelfde naamgeving als 2de stap, "test" vrij te kiezen) <br/>
+  "!nvcc opdrachtHAC.cu -o test" <br/>
+  
+5.- geef onderstaande code in (zelfde naamgeving als stap 4, afbeelding met correcte naamgeving) <br/>
+  !./test mario.png <br/>
   
   
   output atm zou het een gray scale moeten zijn (begin punt opdracht)
