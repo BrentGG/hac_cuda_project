@@ -14,9 +14,17 @@ struct Pixel
 
 void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
 {
-  long int avgPixel=0;
-  int maxPixel=0;
-  int minPixel=0;
+  long int avgPixelR=0;
+  int maxPixelR=0;
+  int minPixelR=0;
+
+  long int avgPixelG=0;
+  int maxPixelG=0;
+  int minPixelG=0;
+
+  long int avgPixelB=0;
+  int maxPixelB=0;
+  int minPixelB=0;
 
     for (int y = 0; y < height; y++)
     {
@@ -29,23 +37,47 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
             //wip ideals deel 2 min/max/avg pooling
 
             //avg pooling RED
-            avgPixel=avgPixel+ptrPixel->r
+            avgPixelR=avgPixelR+ptrPixel->r;
+              avgPixelG=avgPixelG+ptrPixel->g;
+                avgPixelB=avgPixelB+ptrPixel->b;
             //max pooling RED
-            if (ptrPixel->r > maxPixel)
+            if (ptrPixel->r > maxPixelR)
             {
-              maxPixel=ptrPixel->r;
+              maxPixelR=ptrPixel->r;
             }
             //min pooling RED
-            if (ptrPixel->r < minPixel)
+            if (ptrPixel->r < minPixelR)
             {
-              minPixel=ptrPixel->r;
+              minPixelR=ptrPixel->r;
+            }
+            //max pooling GREEN
+            if (ptrPixel->g > maxPixelG)
+            {
+              maxPixelG=ptrPixel->g;
+            }
+            //min pooling GREEN
+            if (ptrPixel->g < minPixelG)
+            {
+              minPixelG=ptrPixel->g;
+            }
+              //max pooling BLUE
+            if (ptrPixel->b > maxPixelB)
+            {
+              maxPixelB=ptrPixel->b;
+            }
+            //min pooling BLUE
+            if (ptrPixel->b < minPixelB)
+            {
+              minPixelB=ptrPixel->b;
             }
         }
     }
-    avgPixel= avgPixel/(height*width);
-    printf("avg pooling for red %li\n", avgPixel );
-    printf("max pooling for red %li\n", maxPixel );
-    printf("min pooling for red %li\n", minPixel );
+    avgPixelR= avgPixelR/(height*width);
+    avgPixelG= avgPixelG/(height*width);
+    avgPixelB= avgPixelB/(height*width);
+    printf("avg pooling for red: %li ,green: %li and blue: %li\n", avgPixelR ,avgPixelG ,avgPixelB );
+    printf("max pooling for red: %d ,green: %d and blue: %d\n", maxPixelR, maxPixelG, maxPixelB );
+    printf("min pooling for red: %d ,green: %d and blue: %d\n", minPixelR, minPixelG, minPixelB );
 
 }
 
