@@ -14,18 +14,48 @@ struct Pixel
 
 void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
 {
+  int i=0;
+  long int avgPixel;
+  int maxPixel;
+  int minPixel;
+
     for (int y = 0; y < height; y++)
     {
         for (int x = 0; x < width; x++)
         {
             Pixel* ptrPixel = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
             unsigned char pixelValue = (unsigned char)(ptrPixel->r * 0.2126f + ptrPixel->g * 0.7152f + ptrPixel->b * 0.0722f);
+
+
+            //wip ideals deel 2 min/max/avg pooling
+
+            //avg pooling RED
+            avgPixel=avgPixel+ptrPixel->r
+            i++;
+            avgPixel= avgPixel/i; //doing end of convertion
+            //max pooling RED
+            if (ptrPixel->r > maxPixel)
+            {
+              maxPixel=ptrPixel->r;
+            }
+            //min pooling RED
+            if (ptrPixel->r < minPixel)
+            {
+              minPixel=ptrPixel->r;
+            }
+
+
             ptrPixel->r = pixelValue;
             ptrPixel->g = pixelValue;
             ptrPixel->b = pixelValue;
             ptrPixel->a = 255;
         }
     }
+    avgPixel= avgPixel/i;
+    printf("avg pooling for red %li\n", avgPixel );
+    printf("max pooling for red %li\n", maxPixel );
+    printf("min pooling for red %li\n", minPixel );
+
 }
 
 
