@@ -27,7 +27,6 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
   int maxPixelB=0;
   int minPixelB=0;
 */
-  int convolutie;
 
     for (int y = 0; y < height-2; y++)
     {
@@ -105,27 +104,10 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
 | 4 | 5 | 6 |
 | 7 | 8 | 9 |
 */
-convolutie=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
-printf("waarde is %d\n",convolutie);
-            if ((pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9) <0)
-            {
-              ptrPixel1->r=200;
-              ptrPixel1->g=200;
-              ptrPixel1->b=200;
-              ptrPixel1->a=200;
-
-            }
-            else
-            {
               ptrPixel1->r=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
               ptrPixel1->g=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
               ptrPixel1->b=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
               ptrPixel1->a=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
-            }
-
-
-
-
 
         }
     }
