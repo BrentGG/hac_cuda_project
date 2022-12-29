@@ -105,7 +105,7 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
 | 4 | 5 | 6 |
 | 7 | 8 | 9 |
 */
-convolutie=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9
+convolutie=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
 printf("waarde is %d\n",convolutie);
             if ((pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9) <0)
             {
