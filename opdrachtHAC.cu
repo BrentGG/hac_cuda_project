@@ -14,6 +14,7 @@ struct Pixel
 
 void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
 {
+  /*
   long int avgPixelR=0;
   int maxPixelR=0;
   int minPixelR=0;
@@ -25,16 +26,43 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
   long int avgPixelB=0;
   int maxPixelB=0;
   int minPixelB=0;
+*/
+  int convolutie;
 
-
-    for (int y = 0; y < height; y++)
+    for (int y = 0; y < height-2; y++)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < width-2; x++)
         {
-            Pixel* ptrPixel = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
-            unsigned char pixelValue = (unsigned char)(ptrPixel->r * 0.2126f + ptrPixel->g * 0.7152f + ptrPixel->b * 0.0722f);
+            Pixel* ptrPixel1 = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
+            unsigned char pixelValue1 = (unsigned char)(ptrPixel1->r * 0.2126f + ptrPixel1->g * 0.7152f + ptrPixel1->b * 0.0722f);
+
+            Pixel* ptrPixel2 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+1)];
+            unsigned char pixelValue2 = (unsigned char)(ptrPixel2->r * 0.2126f + ptrPixel2->g * 0.7152f + ptrPixel2->b * 0.0722f);
+
+            Pixel* ptrPixel3 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+2)];
+            unsigned char pixelValue3 = (unsigned char)(ptrPixel3->r * 0.2126f + ptrPixel3->g * 0.7152f + ptrPixel3->b * 0.0722f);
+
+            Pixel* ptrPixel4 = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
+            unsigned char pixelValue4 = (unsigned char)(ptrPixel4->r * 0.2126f + ptrPixel4->g * 0.7152f + ptrPixel4->b * 0.0722f);
+
+            Pixel* ptrPixel5 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+1)];
+            unsigned char pixelValue5 = (unsigned char)(ptrPixel5->r * 0.2126f + ptrPixel5->g * 0.7152f + ptrPixel5->b * 0.0722f);
+
+            Pixel* ptrPixel6 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+2)];
+            unsigned char pixelValue6 = (unsigned char)(ptrPixel6->r * 0.2126f + ptrPixel6->g * 0.7152f + ptrPixel6->b * 0.0722f);
+
+            Pixel* ptrPixel7 = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
+            unsigned char pixelValue7 = (unsigned char)(ptrPixel7->r * 0.2126f + ptrPixel7->g * 0.7152f + ptrPixel7->b * 0.0722f);
+
+            Pixel* ptrPixel8 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+1)];
+            unsigned char pixelValue8 = (unsigned char)(ptrPixel8->r * 0.2126f + ptrPixel8->g * 0.7152f + ptrPixel8->b * 0.0722f);
+
+            Pixel* ptrPixel9 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+2)];
+            unsigned char pixelValue9 = (unsigned char)(ptrPixel9->r * 0.2126f + ptrPixel9->g * 0.7152f + ptrPixel9->b * 0.0722f);
+
 
 //---------------------min/max/avg pooling----------------------------------------------------------------
+/*
             //avg pooling RED
             avgPixelR=avgPixelR+ptrPixel->r;
             avgPixelG=avgPixelG+ptrPixel->g;
@@ -70,15 +98,32 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
               minPixelB=ptrPixel->b;
             }
 
-
-//---------------------2D convolutie----------------------------------------------------------------------
-/*
-
-
-
-
-
 */
+//---------------------2D convolutie----------------------------------------------------------------------
+/* Pixel orientation
+| 1 | 2 | 3 |
+| 4 | 5 | 6 |
+| 7 | 8 | 9 |
+*/
+convolutie=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9
+printf("waarde is %d\n",convolutie);
+            if ((pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9) <0)
+            {
+              ptrPixel1->r=200;
+              ptrPixel1->g=200;
+              ptrPixel1->b=200;
+              ptrPixel1->a=200;
+
+            }
+            else
+            {
+              ptrPixel1->r=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
+              ptrPixel1->g=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
+              ptrPixel1->b=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
+              ptrPixel1->a=pixelValue1+pixelValue3+pixelValue7-pixelValue3-pixelValue6-pixelValue9;
+            }
+
+
 
 
 
