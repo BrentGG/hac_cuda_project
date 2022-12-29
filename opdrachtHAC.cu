@@ -42,22 +42,22 @@ void ConvertImageToGrayCpu(unsigned char* imageRGBA, int width, int height)
             Pixel* ptrPixel3 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+2)];
             unsigned char pixelValue3 = (unsigned char)(ptrPixel3->r * 0.2126f + ptrPixel3->g * 0.7152f + ptrPixel3->b * 0.0722f);
 
-            Pixel* ptrPixel4 = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
+            Pixel* ptrPixel4 = (Pixel*)&imageRGBA[(y+1) * width * 4 + 4 * x];
             unsigned char pixelValue4 = (unsigned char)(ptrPixel4->r * 0.2126f + ptrPixel4->g * 0.7152f + ptrPixel4->b * 0.0722f);
 
-            Pixel* ptrPixel5 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+1)];
+            Pixel* ptrPixel5 = (Pixel*)&imageRGBA[(y+1) * width * 4 + (4 * x+1)];
             unsigned char pixelValue5 = (unsigned char)(ptrPixel5->r * 0.2126f + ptrPixel5->g * 0.7152f + ptrPixel5->b * 0.0722f);
 
-            Pixel* ptrPixel6 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+2)];
+            Pixel* ptrPixel6 = (Pixel*)&imageRGBA[(y+1) * width * 4 + (4 * x+2)];
             unsigned char pixelValue6 = (unsigned char)(ptrPixel6->r * 0.2126f + ptrPixel6->g * 0.7152f + ptrPixel6->b * 0.0722f);
 
-            Pixel* ptrPixel7 = (Pixel*)&imageRGBA[y * width * 4 + 4 * x];
+            Pixel* ptrPixel7 = (Pixel*)&imageRGBA[(y+2) * width * 4 + 4 * x];
             unsigned char pixelValue7 = (unsigned char)(ptrPixel7->r * 0.2126f + ptrPixel7->g * 0.7152f + ptrPixel7->b * 0.0722f);
 
-            Pixel* ptrPixel8 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+1)];
+            Pixel* ptrPixel8 = (Pixel*)&imageRGBA[(y+2) * width * 4 + (4 * x+1)];
             unsigned char pixelValue8 = (unsigned char)(ptrPixel8->r * 0.2126f + ptrPixel8->g * 0.7152f + ptrPixel8->b * 0.0722f);
 
-            Pixel* ptrPixel9 = (Pixel*)&imageRGBA[y * width * 4 + (4 * x+2)];
+            Pixel* ptrPixel9 = (Pixel*)&imageRGBA[(y+2) * width * 4 + (4 * x+2)];
             unsigned char pixelValue9 = (unsigned char)(ptrPixel9->r * 0.2126f + ptrPixel9->g * 0.7152f + ptrPixel9->b * 0.0722f);
 
 
