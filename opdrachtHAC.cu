@@ -12,21 +12,24 @@ struct Pixel
     unsigned char r, g, b, a;
 };
 
-void convoluteCPU(unsigned char* imageRGBA, int width, int height, float kernel[3][3])
+void convoluteCPU(unsigned char* input, unsigned char* output, int width, int height, float kernel[3][3])
 {
-    for (int row = 0; row < height; row++) {
-        for (int col = 0; col < width; col++) {
+    for (int row = 0; row < height - 2; row++) {
+        for (int col = 0; col < width - 2; col++) {
             int sum[4] = {0, 0, 0, 0};
+            int opacity = 0;
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
-                    Pixel* p = (Pixel*)&imageRGBA[((row + 1) + (i - 1)) * width * 4 + 4 * ((col + 1) + (j - 1))];
+                    Pixel* p = (Pixel*)&input[((row + 1) + (i - 1)) * width * 4 + 4 * ((col + 1) + (j - 1))];
                     sum[0] += p->r * kernel[i][j];
                     sum[1] += p->g * kernel[i][j];
                     sum[2] += p->b * kernel[i][j];
                     sum[3] += p->a * kernel[i][j];
+                    if (i == 1 || j == 1)
+                        opacity = p->a;
                 }
             }
-            Pixel* ptrPixel = (Pixel*)&imageRGBA[row * width * 4 + 4 * col];
+            Pixel* ptrPixel = (Pixel*)&output[row * width * 4 + 4 * col];
             for (int i = 0; i < 3; ++i) {
                 if (sum[i] < 0)
                     sum[i] = 0;
@@ -36,20 +39,7 @@ void convoluteCPU(unsigned char* imageRGBA, int width, int height, float kernel[
             ptrPixel->r = sum[0];
             ptrPixel->g = sum[1];
             ptrPixel->b = sum[2];
-            //ptrPixel->a = sum[3];
-        }
-    }
-
-    for (int row = height - 2; row < height; row++) {
-        for (int col = 0; col < width; col++) {
-            Pixel* ptrPixel = (Pixel*)&imageRGBA[row * width * 4 + 4 * col];
-            ptrPixel->a = 0;
-        }
-    }
-    for (int col = width - 2; col < width; col++) {
-        for (int row = 0; row < height; row++) {
-            Pixel* ptrPixel = (Pixel*)&imageRGBA[row * width * 4 + 4 * col];
-            ptrPixel->a = 0;
+            ptrPixel->a = opacity;
         }
     }
 }
@@ -95,8 +85,8 @@ int main(int argc, char** argv)
     // Open image
     int width, height, componentCount;
     printf("Loading png file...\r\n");
-    unsigned char* imageData = stbi_load(argv[1], &width, &height, &componentCount, 4);
-    if (!imageData)
+    unsigned char* inputData = stbi_load(argv[1], &width, &height, &componentCount, 4);
+    if (!inputData)
     {
         printf("Failed to open image\r\n");
         return -1;
@@ -104,15 +94,16 @@ int main(int argc, char** argv)
     printf(" DONE \r\n" );
 
     // Process image on cpu
-    printf("Processing image...\r\n");
-    convoluteCPU(imageData, width, height, edgeDetection);
+    unsigned char* outputData = (unsigned char*) malloc(sizeof(unsigned char) * (width - 2) * (height - 2) * 4);
+    printf("Applying convolution...\r\n");
+    convoluteCPU(inputData, outputData, width, height, edgeDetection);
     printf(" DONE \r\n");
 
     // Copy data to the gpu
     /*printf("Copy data to GPU...\r\n");
     unsigned char* ptrImageDataGpu = nullptr;
     cudaMalloc(&ptrImageDataGpu, width * height * 4);
-    cudaMemcpy(ptrImageDataGpu, imageData, width * height * 4, cudaMemcpyHostToDevice);
+    cudaMemcpy(ptrImageDataGpu, inputData, width * height * 4, cudaMemcpyHostToDevice);
     printf(" DONE \r\n");*/
 
     // Process image on gpu
@@ -124,7 +115,7 @@ int main(int argc, char** argv)
 
     // Copy data from the gpu
     /*printf("Copy data from GPU...\r\n");
-    cudaMemcpy(imageData, ptrImageDataGpu, width * height * 4, cudaMemcpyDeviceToHost);
+    cudaMemcpy(inputData, ptrImageDataGpu, width * height * 4, cudaMemcpyDeviceToHost);
     printf(" DONE \r\n");*/
 
     // Build output filename
@@ -132,10 +123,10 @@ int main(int argc, char** argv)
 
     // Write image back to disk
     printf("Writing png to disk...\r\n");
-    stbi_write_png(fileNameOut, width, height, 4, imageData, 4 * width);
+    stbi_write_png(fileNameOut, width, height, 4, outputData, 4 * width);
     printf(" DONE\r\n");
 
     // Free memory
     //cudaFree(ptrImageDataGpu);
-    stbi_image_free(imageData);
+    stbi_image_free(inputData);
 }
