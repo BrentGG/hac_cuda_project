@@ -8,13 +8,13 @@
 - [X] min/max pooling berekenen (zie deel 2) CPU
 
 
-![titel opdracht](files&Documents/cudaTaakTitel.png?raw=true)
+![titel opdracht](images/cudaTaakTitel.png?raw=true)
 
 ## Deel 1:
-![opdracht 1](files&Documents/cudaTaakDeel1.png?raw=true)
+![opdracht 1](images/cudaTaakDeel1.png?raw=true)
 
 ## Deel 2:
-![opdracht 2](files&Documents/cudaTaakDeel2.png?raw=true)
+![opdracht 2](images/cudaTaakDeel2.png?raw=true)
 
 ## getting started (WIP)
 
