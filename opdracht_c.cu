@@ -125,17 +125,41 @@ int main(int argc, char** argv)
         {1, 0, -1}
     };
 
+    char namingConvolution [3][25] = {
+        "marioConvolution.png",
+        "bertConvolution.png",
+        "therockConvolution.png"
+    };
+    char namingMax [3][15] = {
+        "marioMax.png",
+        "bertMax.png",
+        "therockMax.png"
+    };
+    char namingMin [3][15] = {
+        "marioMin.png",
+        "bertMin.png",
+        "therockMin.png"
+    };
+    char namingAvg [3][15] = {
+        "marioAvg.png",
+        "bertAvg.png",
+        "therockAvg.png"
+    };
+
+ for(int f = 1; f < 4; f++) //test voor 3 afbeeldingen
+    {
     // Check argument count
     if (argc < 2)
     {
         printf("Not enough arguments.");
         return -1;
     }
+   printf("f is %d.", f);
 
     // Open image
     int width, height, componentCount;
     printf("Loading png file...\r\n");
-    unsigned char* inputData = stbi_load(argv[1], &width, &height, &componentCount, 4);
+    unsigned char* inputData = stbi_load(argv[f], &width, &height, &componentCount, 4);
     if (!inputData)
     {
         printf("Failed to open image\r\n");
@@ -146,7 +170,7 @@ int main(int argc, char** argv)
     // Convolution on CPU
     unsigned char* outputConvolution = (unsigned char*) malloc(sizeof(unsigned char) * (width - 2) * (height - 2) * 4);
     printf("Applying convolution...\r\n");
-    convoluteCPU(inputData, outputConvolution, width, height, gaussianBlur);
+    convoluteCPU(inputData, outputConvolution, width, height, edgeDetection);
     printf(" DONE \r\n");
 
     // Pooling on GPU
@@ -161,11 +185,13 @@ int main(int argc, char** argv)
 
     // Write images back to disk
     printf("Writing pngs to disk...\r\n");
-    stbi_write_png("convolution.png", width - 2, height - 2, 4, outputConvolution, 4 * width);
-    stbi_write_png("maxpool.png", poolWidth, poolHeight, 4, outputMaxPool, 4 * poolWidth);
-    stbi_write_png("minpool.png", poolWidth, poolHeight, 4, outputMinPool, 4 * poolWidth);
-    stbi_write_png("avgpool.png", poolWidth, poolHeight, 4, outputAvgPool, 4 * poolWidth);
+    stbi_write_png(namingConvolution[f-1], width - 2, height - 2, 4, outputConvolution, 4 * width);
+    stbi_write_png(namingMax[f-1], poolWidth, poolHeight, 4, outputMaxPool, 4 * poolWidth);
+    stbi_write_png(namingMin[f-1], poolWidth, poolHeight, 4, outputMinPool, 4 * poolWidth);
+    stbi_write_png(namingAvg[f-1], poolWidth, poolHeight, 4, outputAvgPool, 4 * poolWidth);
     printf(" DONE\r\n");
+
+
 
     // Copy data to the gpu
     /*printf("Copy data to GPU...\r\n");
@@ -193,4 +219,5 @@ int main(int argc, char** argv)
     stbi_image_free(outputMaxPool);
     stbi_image_free(outputMinPool);
     stbi_image_free(outputAvgPool);
+    }
 }
