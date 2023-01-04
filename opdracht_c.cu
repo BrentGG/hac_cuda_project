@@ -146,14 +146,12 @@ int main(int argc, char** argv)
     // Convolution on CPU
     unsigned char* outputConvolution = (unsigned char*) malloc(sizeof(unsigned char) * (width - 2) * (height - 2) * 4);
     printf("Applying convolution...\r\n");
-    convoluteCPU(inputData, outputConvolution, width, height, edgeDetection);
+    convoluteCPU(inputData, outputConvolution, width, height, gaussianBlur);
     printf(" DONE \r\n");
 
     // Pooling on GPU
     int poolWidth = (int)(width / POOLSTRIDE);
     int poolHeight = (int)(height / POOLSTRIDE);
-    printf("%d %d\n", width, height);
-    printf("%d %d\n", poolWidth, poolHeight);
     unsigned char* outputMaxPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
     unsigned char* outputMinPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
     unsigned char* outputAvgPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
@@ -163,7 +161,7 @@ int main(int argc, char** argv)
 
     // Write images back to disk
     printf("Writing pngs to disk...\r\n");
-    stbi_write_png("convolution.png", (width - 2), (height - 2), 4, outputConvolution, 4 * (width - 2));
+    stbi_write_png("convolution.png", width - 2, height - 2, 4, outputConvolution, 4 * width);
     stbi_write_png("maxpool.png", poolWidth, poolHeight, 4, outputMaxPool, 4 * poolWidth);
     stbi_write_png("minpool.png", poolWidth, poolHeight, 4, outputMinPool, 4 * poolWidth);
     stbi_write_png("avgpool.png", poolWidth, poolHeight, 4, outputAvgPool, 4 * poolWidth);
