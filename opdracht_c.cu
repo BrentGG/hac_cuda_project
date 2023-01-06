@@ -3,8 +3,7 @@
 #include <math.h>
 #include <curl/curl.h>
 #include <string.h>
-#include "cuda.h"
-#include "cuda_runtime.h"
+#include <time.h>
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
@@ -102,6 +101,20 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
   return written;
 }
 
+void printTime(float seconds) {
+    int m = (int)(seconds / 60);
+    int s = (int)(seconds - (m * 60));
+    int ms = (int)((seconds - (m * 60) - s) * 1000);
+    if (m > 0)
+        printf("%dm ", m);
+    if (s > 0 || m > 0)
+        printf("%ds ", s);
+    if (ms > 0)
+        printf("%dms", ms);
+    else if (m == 0 && s == 0)
+        printf("%fms", seconds * 1000);
+}
+
 int main(int argc, char** argv)
 {
     // Image URLs and names
@@ -162,6 +175,9 @@ int main(int argc, char** argv)
     };
 
     // Execute all the operations for every image
+    clock_t start;
+    float execTime;
+    float totalTime = 0;
     for(int f = 0; f < imageAmount; f++) {
         // Open image
         int width, height, componentCount;
@@ -176,8 +192,13 @@ int main(int argc, char** argv)
         // Convolution on CPU
         unsigned char* outputConvolution = (unsigned char*) malloc(sizeof(unsigned char) * (width - 2) * (height - 2) * 4);
         printf("Applying convolution...\n");
+        start = clock();
         convoluteCPU(inputData, outputConvolution, width, height, edgeDetection);
-        printf(" DONE\n");
+        execTime = ((float)(clock() - start)) / CLOCKS_PER_SEC;
+        totalTime += execTime;
+        printf(" DONE (");
+        printTime(execTime);
+        printf(")\n");
 
         // Pooling on CPU
         int poolWidth = (int)(width / POOLSTRIDE);
@@ -186,8 +207,13 @@ int main(int argc, char** argv)
         unsigned char* outputMinPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
         unsigned char* outputAvgPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
         printf("Pooling...\n");
+        start = clock();
         pool(inputData, outputMaxPool, outputMinPool, outputAvgPool, width, height, POOLSTRIDE);
-        printf(" DONE\n");
+        execTime = ((float)(clock() - start)) / CLOCKS_PER_SEC;
+        totalTime += execTime;
+        printf(" DONE (");
+        printTime(execTime);
+        printf(")\n");
 
         // Write images back to disk
         printf("Writing output pngs to disk...\n");
@@ -216,5 +242,9 @@ int main(int argc, char** argv)
         stbi_image_free(outputMaxPool);
         stbi_image_free(outputMinPool);
         stbi_image_free(outputAvgPool);
+
+        printf("Total execution time of convolution and pooling on CPU: ");
+        printTime(totalTime);
+        printf("\n");
     }
 }
