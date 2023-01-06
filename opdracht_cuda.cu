@@ -115,6 +115,9 @@ int main(int argc, char** argv)
 
     // Write images back to disk
     printf("Writing pngs to disk...\r\n");
+    //outputConvolution is leeg dus er wordt geen afb geschreven
+    printf(" output GPU %u\n", outputConvolutionGPU);
+    printf(" output %u\n", outputConvolution);
     stbi_write_png("convolutionGPU.png", width - 2, height - 2, 4, outputConvolution, 4 * (width - 2));
     printf(" DONE\r\n");
 
