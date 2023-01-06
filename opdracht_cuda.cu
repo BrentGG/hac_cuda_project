@@ -26,10 +26,10 @@ __global__ void convoluteGPU(unsigned char* input, unsigned char* output, int wi
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
                 Pixel* p = (Pixel*)&input[((row + 1) + (i - 1)) * width * 4 + 4 * ((col + 1) + (j - 1))];
-                sum[0] += p->r * kernel[i][j];
-                sum[1] += p->g * kernel[i][j];
-                sum[2] += p->b * kernel[i][j];
-                sum[3] += p->a * kernel[i][j];
+                sum[0] += p->r * 0.2;
+                sum[1] += p->g * 0.2;
+                sum[2] += p->b * 0.2;
+                sum[3] += p->a * 0.2;
                 if (i == 1 || j == 1)
                     opacity = p->a;
             }
@@ -45,6 +45,8 @@ __global__ void convoluteGPU(unsigned char* input, unsigned char* output, int wi
         ptrPixel->g = sum[1];
         ptrPixel->b = sum[2];
         ptrPixel->a = opacity;
+        //als de sum wordt berekend zonder kernel komt alles tot hier ander loopt hij vast eens hij de kernel tegenkomt
+        //printf("test waardes sum red:%d green: %d blue:%d a: %d\n", sum[0], sum[1], sum[3], opacity);
     }
 }
 
