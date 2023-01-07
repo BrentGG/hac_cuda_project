@@ -173,6 +173,7 @@ int main(int argc, char** argv)
         }
         printf(" DONE\n");
     }
+    printf("\n");
     curl_easy_cleanup(curl_handle);
     curl_global_cleanup();
 
@@ -262,8 +263,9 @@ int main(int argc, char** argv)
         stbi_image_free(outputMinPool);
         stbi_image_free(outputAvgPool);
 
-        printf("Total execution time of convolution and pooling on CPU: ");
-        printTime(totalTime);
         printf("\n");
     }
+    printf("Total execution time of convolution and pooling on CPU: ");
+    printTime(totalTime);
+    printf("\n");
 }
