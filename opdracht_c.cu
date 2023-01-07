@@ -118,16 +118,35 @@ void printTime(float seconds) {
 int main(int argc, char** argv)
 {
     // Image URLs and names
-    int imageAmount = 3;
+    int imageAmount = 10;
     char urls[imageAmount][1024] = {
         "https://images.nintendolife.com/835d44208f0a6/mario-movie.large.jpg", // mario
         "https://img.buzzfeed.com/buzzfeed-static/static/2022-03/16/0/enhanced/c1de3db394fb/original-1460-1647389279-4.png", // the rock
         "https://images.squarespace-cdn.com/content/v1/5b788d28697a98e17a6d4c7a/b83f0eab-7dd6-4e9b-83a1-13139ac2a03b/rickroll+cropped.png", // rick astley
+        "https://a-z-animals.com/media/2021/02/Kinkajou-header.jpg", //kinkajou
+        "https://static.wikia.nocookie.net/marveldatabase/images/6/64/Incredible_Hulk_Vol_2_75_Textless.jpg/revision/latest/scale-to-width-down/300?cb=20050830175533", //hulk
+        "https://laughingsquid.com/wp-content/uploads/bert-20110421-082506.jpg", //bert
+        "https://car-anwb.akamaized.net/aas-afbeeldingen/117222g.jpg?imwidth=760&imheight=500", //ford
+        "https://i.pinimg.com/originals/41/0b/2e/410b2eb9e59520a7ad4de7aa4fc9f722.jpg", //micky minnie mouse
+        "https://pbs.twimg.com/media/CDN2AnCWYAIquzo.jpg", //canadian poop
+        "https://media.istockphoto.com/id/1153678999/nl/vector/de-titel-van-het-eind-handschrift-op-rode-ronde-bacground-oude-film-einde-scherm-vector.jpg?s=612x612&w=0&k=20&c=OmFVqkf5TgXxizS0pWq5lEgbNQTNSny5W-BPmBahr1I=", //the end
+        //extra URL links 
+        /*
+        "https://images0.persgroep.net/rcs/MP9RjFYsAOAE1ArHRLyorkHlKXU/diocontent/203486167/_fitwidth/1240?appId=93a17a8fd81db0de025c8abd1cca1279&quality=0.9",  //biden
+        "https://cdn.shopify.com/s/files/1/0351/9630/5545/products/Good-Smile-Company-Pocket-Maquette-Demon-Slayer-Kimetsu-no-Yaiba-01-Single-Box-Random-7_bef2ee96-861e-41f5-9afb-b5650961e626_1200x.jpg?v=1631869901", //demon slayer
+        */
     };
     char names[imageAmount][20] = {
         "image1.png",
         "image2.png",
-        "image3.png"
+        "image3.png",
+        "image4.png",
+        "image5.png",
+        "image6.png",
+        "image7.png",
+        "image8.png",
+        "image9.png",
+        "image10.png"
     };
 
     // Get all the images from their URL
