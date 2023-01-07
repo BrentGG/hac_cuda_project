@@ -15,21 +15,21 @@ struct Pixel
     unsigned char r, g, b, a;
 };
 
-__global__ void convoluteGPU(unsigned char* input, unsigned char* output, int width, int height, float kernel[3][3])
+__global__ void convoluteGPU(unsigned char* input, unsigned char* output, int width, int height, float* kernel)
 {
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
-
+    
     if (row < height - 2 && col < width - 2) {
         int sum[4] = {0, 0, 0, 0};
         int opacity = 0;
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
                 Pixel* p = (Pixel*)&input[((row + 1) + (i - 1)) * width * 4 + 4 * ((col + 1) + (j - 1))];
-                sum[0] += p->r * 0.2;
-                sum[1] += p->g * 0.2;
-                sum[2] += p->b * 0.2;
-                sum[3] += p->a * 0.2;
+                sum[0] += p->r * kernel[i * 3 + j];
+                sum[1] += p->g * kernel[i * 3 + j];
+                sum[2] += p->b * kernel[i * 3 + j];
+                sum[3] += p->a * kernel[i * 3 + j];
                 if (i == 1 || j == 1)
                     opacity = p->a;
             }
@@ -45,8 +45,6 @@ __global__ void convoluteGPU(unsigned char* input, unsigned char* output, int wi
         ptrPixel->g = sum[1];
         ptrPixel->b = sum[2];
         ptrPixel->a = opacity;
-        //als de sum wordt berekend zonder kernel komt alles tot hier ander loopt hij vast eens hij de kernel tegenkomt
-        //printf("test waardes sum red:%d green: %d blue:%d a: %d\n", sum[0], sum[1], sum[3], opacity);
     }
 }
 
@@ -67,13 +65,15 @@ int main(int argc, char** argv)
         {1, 0, -1},
         {1, 0, -1}
     };
-
-    // Check argument count
-    if (argc < 2)
-    {
-        printf("Not enough arguments.");
-        return -1;
-    }
+    float *gaussianBlurGPU = nullptr;
+    cudaMalloc(&gaussianBlurGPU, 3 * 3 * sizeof(float));
+    cudaMemcpy(gaussianBlurGPU, gaussianBlur, 3 * 3 * sizeof(float), cudaMemcpyHostToDevice);
+    float *edgeDetectionGPU = nullptr;
+    cudaMalloc(&edgeDetectionGPU, 3 * 3 * sizeof(float));
+    cudaMemcpy(edgeDetectionGPU, edgeDetection, 3 * 3 * sizeof(float), cudaMemcpyHostToDevice);
+    float *exampleGPU = nullptr;
+    cudaMalloc(&exampleGPU, 3 * 3 * sizeof(float));
+    cudaMemcpy(exampleGPU, example, 3 * 3 * sizeof(float), cudaMemcpyHostToDevice);
 
     // Open image
     int width, height, componentCount;
@@ -86,11 +86,7 @@ int main(int argc, char** argv)
     }
     printf(" DONE \r\n" );
 
-    /* --- */
-    /* GPU */
-    /* --- */
-
-    // Copy data to the gpu
+    // Copy data to the GPU
     printf("Copy data to GPU...\r\n");
     unsigned char* inputDataGPU = nullptr;
     cudaMalloc(&inputDataGPU, width * height * 4);
@@ -103,22 +99,19 @@ int main(int argc, char** argv)
     printf("Running CUDA Kernel...\r\n");
     dim3 blockSize(32, 32);
     dim3 gridSize(width / blockSize.x, height / blockSize.y);
-    convoluteGPU<<<gridSize, blockSize>>>(inputDataGPU, outputConvolutionGPU, width, height, gaussianBlur);
+    convoluteGPU<<<gridSize, blockSize>>>(inputDataGPU, outputConvolutionGPU, width, height, edgeDetectionGPU);
     cudaDeviceSynchronize();
     printf(" DONE \r\n" );
 
-    // Copy data from the gpu
+    // Copy data from the GPU
     printf("Copy data from GPU...\r\n");
-    unsigned char* outputConvolution = nullptr;
+    unsigned char* outputConvolution = (unsigned char*) malloc(sizeof(unsigned char) * (width - 2) * (height - 2) * 4);
     cudaMemcpy(outputConvolution, outputConvolutionGPU, (width - 2) * (height - 2) * 4, cudaMemcpyDeviceToHost);
     printf(" DONE \r\n");
 
     // Write images back to disk
     printf("Writing pngs to disk...\r\n");
-    //outputConvolution is leeg dus er wordt geen afb geschreven
-    printf(" output GPU %u\n", outputConvolutionGPU);
-    printf(" output %u\n", outputConvolution);
-    stbi_write_png("convolutionGPU.png", width - 2, height - 2, 4, outputConvolution, 4 * (width - 2));
+    stbi_write_png("convolutionGPU.png", width - 2, height - 2, 4, outputConvolution, 4 * width);
     printf(" DONE\r\n");
 
     // Free memory
@@ -126,4 +119,8 @@ int main(int argc, char** argv)
     cudaFree(outputConvolutionGPU);
     stbi_image_free(inputData);
     stbi_image_free(outputConvolution);
+
+    cudaFree(gaussianBlurGPU);
+    cudaFree(edgeDetectionGPU);
+    cudaFree(exampleGPU);
 }
