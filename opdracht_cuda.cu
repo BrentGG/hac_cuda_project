@@ -212,7 +212,7 @@ int main(int argc, char** argv)
         unsigned char* outputConvolutionGPU = nullptr;
         cudaMalloc(&outputConvolutionGPU, (width - 2) * (height - 2) * 4);
         dim3 blockSize(32, 32);
-        dim3 convGridSize(width / blockSize.x, height / blockSize.y);
+        dim3 convGridSize(width / blockSize.x + 1, height / blockSize.y + 1);
         printf("Applying convolution...\n");
         convoluteGPU<<<convGridSize, blockSize>>>(inputDataGPU, outputConvolutionGPU, width, height, edgeDetectionGPU);
         cudaDeviceSynchronize();
