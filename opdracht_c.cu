@@ -210,7 +210,7 @@ int main(int argc, char** argv)
         printf(" DONE\n" );
 
         // Convolution on CPU
-        unsigned char* outputConvolution = (unsigned char*) malloc(sizeof(unsigned char) * (width - 2) * (height - 2) * 4);
+        unsigned char* outputConvolution = (unsigned char*) malloc((width - 2) * (height - 2) * 4);
         printf("Applying convolution...\n");
         start = clock();
         convoluteCPU(inputData, outputConvolution, width, height, edgeDetection);
@@ -223,9 +223,9 @@ int main(int argc, char** argv)
         // Pooling on CPU
         int poolWidth = (int)(width / POOLSTRIDE);
         int poolHeight = (int)(height / POOLSTRIDE);
-        unsigned char* outputMaxPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
-        unsigned char* outputMinPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
-        unsigned char* outputAvgPool = (unsigned char*) malloc(sizeof(unsigned char) * poolWidth * poolHeight * 4);
+        unsigned char* outputMaxPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
+        unsigned char* outputMinPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
+        unsigned char* outputAvgPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
         printf("Pooling...\n");
         start = clock();
         pool(inputData, outputMaxPool, outputMinPool, outputAvgPool, width, height, POOLSTRIDE);
