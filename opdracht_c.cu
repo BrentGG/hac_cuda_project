@@ -16,12 +16,21 @@ struct Pixel
     unsigned char r, g, b, a;
 };
 
+/** CPU function to apply convolution on an image
+ * input: the input image data
+ * output: where the output image data will be written to
+ * width: width of the input image
+ * height: height of the input image
+ * kernel: the kernel that is used in the convolution
+ */
 void convoluteCPU(unsigned char* input, unsigned char* output, int width, int height, float kernel[3][3])
 {
+    // Iterate over every pixel except the edge pixels
     for (int row = 0; row < height - 2; row++) {
         for (int col = 0; col < width - 2; col++) {
             int sum[4] = {0, 0, 0, 0};
             int opacity = 0;
+            // Iterate over the pixels around the current pixel and calculate the convolution
             for (int i = 0; i < 3; ++i) {
                 for (int j = 0; j < 3; ++j) {
                     Pixel* p = (Pixel*)&input[((row + 1) + (i - 1)) * width * 4 + 4 * ((col + 1) + (j - 1))];
@@ -33,13 +42,15 @@ void convoluteCPU(unsigned char* input, unsigned char* output, int width, int he
                         opacity = p->a;
                 }
             }
-            Pixel* ptrPixel = (Pixel*)&output[row * width * 4 + 4 * col];
+            // If a pixel value is less than 0, make it 0. If it is more than 255, make it 255.
             for (int i = 0; i < 3; ++i) {
                 if (sum[i] < 0)
                     sum[i] = 0;
                 else if (sum[i] > 255)
                     sum[i] = 255;
             }
+            // Set the pixel in the output image
+            Pixel* ptrPixel = (Pixel*)&output[row * width * 4 + 4 * col];
             ptrPixel->r = sum[0];
             ptrPixel->g = sum[1];
             ptrPixel->b = sum[2];
@@ -48,21 +59,34 @@ void convoluteCPU(unsigned char* input, unsigned char* output, int width, int he
     }
 }
 
+/** CPU function to apply max, min and average pooling on an image 
+ * input: the input image data
+ * outputMaxPool: where the output image data of the max pool will be written to
+ * outputMinPool: where the output image data of the min pool will be written to
+ * outputAvgPool: where the output image data of the avg pool will be written to
+ * width: width of the input image
+ * height: height of the input image
+ * poolStride: the width and height of the pooling
+ */
 void poolCPU(unsigned char* input, unsigned char* outputMaxPool, unsigned char* outputMinPool, unsigned char* outputAvgPool, int width, int height, int poolStride) {
     int poolWidth = (int)(width / poolStride);
     int poolHeight = (int)(height / poolStride);
+    // Iterate over the pixels in the input image with steps of poolStride
     int row = 0;
     for (int i = 0; i < height; i += poolStride) {
         int col = 0;
         for (int j = 0; j < width; j += poolStride) {
+            // Set the starting values for max and min
             Pixel* p = (Pixel*)&input[i * width * 4 + 4 * j];
             int max[3] = {p->r, p->g, p->b};
             int min[3] = {p->r, p->g, p->b};
             float avg[3] = {0, 0, 0};
+            // Iterate over all the pixels in a square of size poolStride where to top-left pixel is the pixel at row i and col j
             for (int k = i; k < i + poolStride; ++k) {
                 for (int l = j; l < j + poolStride; ++l) {
                     Pixel* q = (Pixel*)&input[k * width * 4 + 4 * l];
                     int values[3] = {q->r, q->g, q->b};
+                    // Update the max, min and avg values
                     for (int v = 0; v < 3; ++v) {
                         if (values[v] > max[v])
                             max[v] = values[v];
@@ -72,8 +96,10 @@ void poolCPU(unsigned char* input, unsigned char* outputMaxPool, unsigned char* 
                     }
                 }
             }
+            // Calculate the avg values
             for (int v = 0; v < 3; ++v)
                 avg[v] /= poolStride * poolStride;
+            // Set the output pixel for the max, min and avg pool
             Pixel* q = (Pixel*)&outputMaxPool[row * poolWidth * 4 + 4 * col];
             q->r = max[0];
             q->g = max[1];
@@ -95,12 +121,17 @@ void poolCPU(unsigned char* input, unsigned char* outputMaxPool, unsigned char* 
     }
 }
 
+/** Used for curling images
+ */
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
-  size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
-  return written;
+    size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
+    return written;
 }
 
+/** Prints the execution time in a way that is easier to read
+ * seconds: the execution time in seconds
+ */
 void printTime(float seconds) {
     int m = (int)(seconds / 60);
     int s = (int)(seconds - (m * 60));
@@ -211,23 +242,27 @@ int main(int argc, char** argv)
         }
         printf(" DONE\n" );
 
-        // Convolution on CPU
+        // Allocate convolution output
         unsigned char* outputConvolution = (unsigned char*) malloc((width - 2) * (height - 2) * 4);
+
+        // Convolution on CPU
         printf("Applying convolution...\n");
         start = clock();
-        convoluteCPU(inputData, outputConvolution, width, height, edgeDetection);
+        convoluteCPU(inputData, outputConvolution, width, height, edgeDetection); // set the last parameter to gaussianBlur, edgeDetection or example
         execTime = ((float)(clock() - start)) / CLOCKS_PER_SEC;
         totalTime += execTime;
         printf(" DONE (");
         printTime(execTime);
         printf(")\n");
 
-        // Pooling on CPU
+        // Allocate pooling output
         int poolWidth = (int)(width / POOLSTRIDE);
         int poolHeight = (int)(height / POOLSTRIDE);
         unsigned char* outputMaxPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
         unsigned char* outputMinPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
         unsigned char* outputAvgPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
+
+        // Pooling on CPU
         printf("Pooling...\n");
         start = clock();
         poolCPU(inputData, outputMaxPool, outputMinPool, outputAvgPool, width, height, POOLSTRIDE);
@@ -267,6 +302,7 @@ int main(int argc, char** argv)
 
         printf("\n");
     }
+
     printf("Total execution time of convolution and pooling on CPU: ");
     printTime(totalTime);
     printf("\n");

@@ -96,12 +96,17 @@ __global__ void poolGPU(unsigned char* input, unsigned char* outputMaxPool, unsi
     }
 }
 
+/** Used for curling images
+ */
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
   size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
   return written;
 }
 
+/** Prints the execution time in a way that is easier to read
+ * seconds: the execution time in seconds
+ */
 void printTime(float seconds) {
     int m = (int)(seconds / 60);
     int s = (int)(seconds - (m * 60));
@@ -228,14 +233,16 @@ int main(int argc, char** argv)
         cudaMemcpy(inputDataGPU, inputData, width * height * 4, cudaMemcpyHostToDevice);
         printf(" DONE\n" );
 
-        // Convolution on GPU
+        // Allocate convolution output
         unsigned char* outputConvolutionGPU = nullptr;
         cudaMalloc(&outputConvolutionGPU, (width - 2) * (height - 2) * 4);
+
+        // Convolution on GPU
         dim3 blockSize(32, 32);
         dim3 convGridSize(width / blockSize.x + 1, height / blockSize.y + 1);
         printf("Applying convolution...\n");
         start = clock();
-        convoluteGPU<<<convGridSize, blockSize>>>(inputDataGPU, outputConvolutionGPU, width, height, edgeDetectionGPU);
+        convoluteGPU<<<convGridSize, blockSize>>>(inputDataGPU, outputConvolutionGPU, width, height, edgeDetectionGPU); // set the last parameter to gaussianBlurGPU, edgeDetectionGPU or exampleGPU
         cudaDeviceSynchronize();
         execTime = ((float)(clock() - start)) / CLOCKS_PER_SEC;
         totalTime += execTime;
@@ -243,7 +250,7 @@ int main(int argc, char** argv)
         printTime(execTime);
         printf(")\n");
 
-        // Pooling on GPU
+        // Allocate pooling output
         int poolWidth = (int)(width / POOLSTRIDE);
         int poolHeight = (int)(height / POOLSTRIDE);
         unsigned char* outputMaxPoolGPU = nullptr;
@@ -252,6 +259,8 @@ int main(int argc, char** argv)
         cudaMalloc(&outputMinPoolGPU, poolWidth * poolHeight * 4);
         unsigned char* outputAvgPoolGPU = nullptr;
         cudaMalloc(&outputAvgPoolGPU, poolWidth * poolHeight * 4);
+
+        // Pooling on GPU
         dim3 poolGridSize(poolWidth / blockSize.x + 1, poolHeight / blockSize.y + 1);
         printf("Pooling...\n");
         start = clock();
