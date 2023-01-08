@@ -4,7 +4,7 @@
 
 - [x] 2D convolutie uitrekenen (zie deel 1) GPU
 - [x] 2D convolutie uitrekenen (zie deel 1) CPU
-- [ ] min/max pooling berekenen (zie deel 2) GPU
+- [x] min/max pooling berekenen (zie deel 2) GPU
 - [x] min/max pooling berekenen (zie deel 2) CPU
 - [x] afbeeldingen via URL inlezen CPU
 - [ ] afbeeldingen via URL inlezen GPU (streams)
