@@ -49,8 +49,8 @@ void convoluteCPU(unsigned char* input, unsigned char* output, int width, int he
 }
 
 void pool(unsigned char* input, unsigned char* outputMaxPool, unsigned char* outputMinPool, unsigned char* outputAvgPool, int width, int height, int poolStride) {
-    int poolWidth = (int)(width / POOLSTRIDE);
-    int poolHeight = (int)(height / POOLSTRIDE);
+    int poolWidth = (int)(width / poolStride);
+    int poolHeight = (int)(height / poolStride);
     int row = 0;
     for (int i = 0; i < height; i += poolStride) {
         int col = 0;
