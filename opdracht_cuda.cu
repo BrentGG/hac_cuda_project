@@ -3,6 +3,7 @@
 #include <math.h>
 #include <curl/curl.h>
 #include <string.h>
+#include <time.h>
 #include "cuda.h"
 #include "cuda_runtime.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -101,8 +102,24 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
   return written;
 }
 
+void printTime(float seconds) {
+    int m = (int)(seconds / 60);
+    int s = (int)(seconds - (m * 60));
+    int ms = (int)((seconds - (m * 60) - s) * 1000);
+    if (m > 0)
+        printf("%dm ", m);
+    if (s > 0 || m > 0)
+        printf("%ds ", s);
+    if (ms > 0)
+        printf("%dms", ms);
+    else if (m == 0 && s == 0)
+        printf("%fms", seconds * 1000);
+}
+
 int main(int argc, char** argv)
 {
+    clock_t programStart = clock();
+
     // Image URLs and names
     int imageAmount = 10;
     char urls[imageAmount][1024] = {
@@ -190,6 +207,9 @@ int main(int argc, char** argv)
     cudaMemcpy(exampleGPU, example, 3 * 3 * sizeof(float), cudaMemcpyHostToDevice);
 
     // Execute all the operations for every image
+    clock_t start;
+    float execTime;
+    float totalTime = 0;
     for(int f = 0; f < imageAmount; f++) {
         // Open image
         int width, height, componentCount;
@@ -214,9 +234,14 @@ int main(int argc, char** argv)
         dim3 blockSize(32, 32);
         dim3 convGridSize(width / blockSize.x + 1, height / blockSize.y + 1);
         printf("Applying convolution...\n");
+        start = clock();
         convoluteGPU<<<convGridSize, blockSize>>>(inputDataGPU, outputConvolutionGPU, width, height, edgeDetectionGPU);
         cudaDeviceSynchronize();
-        printf(" DONE\n" );
+        execTime = ((float)(clock() - start)) / CLOCKS_PER_SEC;
+        totalTime += execTime;
+        printf(" DONE (");
+        printTime(execTime);
+        printf(")\n");
 
         // Pooling on GPU
         int poolWidth = (int)(width / POOLSTRIDE);
@@ -229,9 +254,14 @@ int main(int argc, char** argv)
         cudaMalloc(&outputAvgPoolGPU, poolWidth * poolHeight * 4);
         dim3 poolGridSize(poolWidth / blockSize.x + 1, poolHeight / blockSize.y + 1);
         printf("Pooling...\n");
+        start = clock();
         poolGPU<<<poolGridSize, blockSize>>>(inputDataGPU, outputMaxPoolGPU, outputMinPoolGPU, outputAvgPoolGPU, width, height, POOLSTRIDE);
         cudaDeviceSynchronize();
-        printf(" DONE\n" );
+        execTime = ((float)(clock() - start)) / CLOCKS_PER_SEC;
+        totalTime += execTime;
+        printf(" DONE (");
+        printTime(execTime);
+        printf(")\n");
 
         // Copy data from the GPU
         printf("Copy data from GPU...\n");
@@ -284,4 +314,12 @@ int main(int argc, char** argv)
     cudaFree(gaussianBlurGPU);
     cudaFree(edgeDetectionGPU);
     cudaFree(exampleGPU);
+
+    printf("Total execution time of convolution and pooling on CPU: ");
+    printTime(totalTime);
+    printf("\n");
+
+    printf("Total program execution time: ");
+    printTime(((float)(clock() - programStart)) / CLOCKS_PER_SEC);
+    printf("\n");
 }

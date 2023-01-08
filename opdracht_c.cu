@@ -117,6 +117,8 @@ void printTime(float seconds) {
 
 int main(int argc, char** argv)
 {
+    clock_t programStart = clock();
+
     // Image URLs and names
     int imageAmount = 10;
     char urls[imageAmount][1024] = {
@@ -267,5 +269,9 @@ int main(int argc, char** argv)
     }
     printf("Total execution time of convolution and pooling on CPU: ");
     printTime(totalTime);
+    printf("\n");
+
+    printf("Total program execution time: ");
+    printTime(((float)(clock() - programStart)) / CLOCKS_PER_SEC);
     printf("\n");
 }
