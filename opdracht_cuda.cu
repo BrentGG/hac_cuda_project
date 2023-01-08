@@ -324,7 +324,7 @@ int main(int argc, char** argv)
     cudaFree(edgeDetectionGPU);
     cudaFree(exampleGPU);
 
-    printf("Total execution time of convolution and pooling on CPU: ");
+    printf("Total execution time of convolution and pooling on GPU: ");
     printTime(totalTime);
     printf("\n");
 
