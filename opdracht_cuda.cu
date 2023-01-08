@@ -50,7 +50,7 @@ __global__ void convoluteGPU(unsigned char* input, unsigned char* output, int wi
     }
 }
 
-__global__ void pool(unsigned char* input, unsigned char* outputMaxPool, unsigned char* outputMinPool, unsigned char* outputAvgPool, int width, int height, int poolStride) {
+__global__ void poolGPU(unsigned char* input, unsigned char* outputMaxPool, unsigned char* outputMinPool, unsigned char* outputAvgPool, int width, int height, int poolStride) {
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
         cudaMalloc(&outputAvgPoolGPU, poolWidth * poolHeight * 4);
         dim3 poolGridSize(poolWidth / blockSize.x + 1, poolHeight / blockSize.y + 1);
         printf("Pooling...\n");
-        pool<<<poolGridSize, blockSize>>>(inputDataGPU, outputMaxPoolGPU, outputMinPoolGPU, outputAvgPoolGPU, width, height, POOLSTRIDE);
+        poolGPU<<<poolGridSize, blockSize>>>(inputDataGPU, outputMaxPoolGPU, outputMinPoolGPU, outputAvgPoolGPU, width, height, POOLSTRIDE);
         cudaDeviceSynchronize();
         printf(" DONE\n" );
 

@@ -48,7 +48,7 @@ void convoluteCPU(unsigned char* input, unsigned char* output, int width, int he
     }
 }
 
-void pool(unsigned char* input, unsigned char* outputMaxPool, unsigned char* outputMinPool, unsigned char* outputAvgPool, int width, int height, int poolStride) {
+void poolCPU(unsigned char* input, unsigned char* outputMaxPool, unsigned char* outputMinPool, unsigned char* outputAvgPool, int width, int height, int poolStride) {
     int poolWidth = (int)(width / poolStride);
     int poolHeight = (int)(height / poolStride);
     int row = 0;
@@ -228,7 +228,7 @@ int main(int argc, char** argv)
         unsigned char* outputAvgPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
         printf("Pooling...\n");
         start = clock();
-        pool(inputData, outputMaxPool, outputMinPool, outputAvgPool, width, height, POOLSTRIDE);
+        poolCPU(inputData, outputMaxPool, outputMinPool, outputAvgPool, width, height, POOLSTRIDE);
         execTime = ((float)(clock() - start)) / CLOCKS_PER_SEC;
         totalTime += execTime;
         printf(" DONE (");
