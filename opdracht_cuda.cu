@@ -95,6 +95,7 @@ __global__ void pool(unsigned char* input, unsigned char* outputMaxPool, unsigne
 
 int main(int argc, char** argv)
 {
+    // Convolution kernel options
     float gaussianBlur[3][3] = {
         {0.0625*1, 0.0625*2, 0.0625*1},
         {0.0625*2, 0.0625*4, 0.0625*2},
@@ -120,35 +121,36 @@ int main(int argc, char** argv)
     cudaMalloc(&exampleGPU, 3 * 3 * sizeof(float));
     cudaMemcpy(exampleGPU, example, 3 * 3 * sizeof(float), cudaMemcpyHostToDevice);
 
+    // Execute all the operations for every image
     // Open image
     int width, height, componentCount;
-    printf("Loading png file...\r\n");
+    printf("Loading png file...\n");
     unsigned char* inputData = stbi_load(argv[1], &width, &height, &componentCount, 4);
     if (!inputData)
     {
         printf("Failed to open image\r\n");
         return -1;
     }
-    printf(" DONE \r\n" );
+    printf(" DONE\n" );
 
-    // Copy data to the GPU
-    printf("Copy data to GPU...\r\n");
+    // Copy data to GPU
+    printf("Copy data to GPU...\n");
     unsigned char* inputDataGPU = nullptr;
     cudaMalloc(&inputDataGPU, width * height * 4);
     cudaMemcpy(inputDataGPU, inputData, width * height * 4, cudaMemcpyHostToDevice);
-    printf(" DONE \r\n");
+    printf(" DONE\n" );
 
-    // Process image on GPU
+    // Convolution on GPU
     unsigned char* outputConvolutionGPU = nullptr;
     cudaMalloc(&outputConvolutionGPU, (width - 2) * (height - 2) * 4);
-    printf("Running CUDA Kernel...\r\n");
     dim3 blockSize(32, 32);
     dim3 convGridSize(width / blockSize.x, height / blockSize.y);
+    printf("Applying convolution...\n");
     convoluteGPU<<<convGridSize, blockSize>>>(inputDataGPU, outputConvolutionGPU, width, height, edgeDetectionGPU);
     cudaDeviceSynchronize();
-    printf(" DONE \r\n" );
+    printf(" DONE\n" );
 
-    // Pool
+    // Pooling on GPU
     int poolWidth = (int)(width / POOLSTRIDE);
     int poolHeight = (int)(height / POOLSTRIDE);
     unsigned char* outputMaxPoolGPU = nullptr;
@@ -158,13 +160,13 @@ int main(int argc, char** argv)
     unsigned char* outputAvgPoolGPU = nullptr;
     cudaMalloc(&outputAvgPoolGPU, poolWidth * poolHeight * 4);
     dim3 poolGridSize(poolWidth / blockSize.x + 1, poolHeight / blockSize.y + 1);
-    printf("Pooling...\r\n");
+    printf("Pooling...\n");
     pool<<<poolGridSize, blockSize>>>(inputDataGPU, outputMaxPoolGPU, outputMinPoolGPU, outputAvgPoolGPU, width, height, POOLSTRIDE);
     cudaDeviceSynchronize();
-    printf(" DONE \r\n" );
+    printf(" DONE\n" );
 
     // Copy data from the GPU
-    printf("Copy data from GPU...\r\n");
+    printf("Copy data from GPU...\n");
     unsigned char* outputConvolution = (unsigned char*) malloc((width - 2) * (height - 2) * 4);
     cudaMemcpy(outputConvolution, outputConvolutionGPU, (width - 2) * (height - 2) * 4, cudaMemcpyDeviceToHost);
     unsigned char* outputMaxPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
@@ -173,15 +175,15 @@ int main(int argc, char** argv)
     cudaMemcpy(outputMinPool, outputMinPoolGPU, poolWidth * poolHeight * 4, cudaMemcpyDeviceToHost);
     unsigned char* outputAvgPool = (unsigned char*) malloc(poolWidth * poolHeight * 4);
     cudaMemcpy(outputAvgPool, outputAvgPoolGPU, poolWidth * poolHeight * 4, cudaMemcpyDeviceToHost);
-    printf(" DONE \r\n");
+    printf(" DONE\n");
 
     // Write images back to disk
-    printf("Writing pngs to disk...\r\n");
+    printf("Writing output pngs to disk...\n");
     stbi_write_png("convolutionGPU.png", width - 2, height - 2, 4, outputConvolution, 4 * width);
     stbi_write_png("maxpoolGPU.png", poolWidth, poolHeight, 4, outputMaxPool, 4 * poolWidth);
     stbi_write_png("minpoolGPU.png", poolWidth, poolHeight, 4, outputMinPool, 4 * poolWidth);
     stbi_write_png("avgpoolGPU.png", poolWidth, poolHeight, 4, outputAvgPool, 4 * poolWidth);
-    printf(" DONE\r\n");
+    printf(" DONE\n");
 
     // Free memory
     cudaFree(inputDataGPU);
